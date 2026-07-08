@@ -10,6 +10,7 @@ endif()
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 list(REMOVE_DUPLICATES CMAKE_MODULE_PATH)
 
+option(MESHFEM_ENABLE_BENCHMARKING   "Enable the benchmarking code" ON)
 option(MESHFEMCORE_BUILD_TESTS "Build MeshFEMCore tests" ${MESHFEMCORE_TOPLEVEL_PROJECT})
 
 include(MeshFEMCoreDependencies)
@@ -50,6 +51,6 @@ if(MESHFEM_DISABLE_CXX11_ABI_GCC)
     target_compile_definitions(MeshFEMCore PUBLIC -D_GLIBCXX_USE_CXX11_ABI=0)
 endif()
 
-if(MESHFEM_ENABLE_BENCHMARKING)
+if (MESHFEM_ENABLE_BENCHMARKING)
     target_compile_definitions(MeshFEMCore PUBLIC -DBENCHMARK)
 endif()
