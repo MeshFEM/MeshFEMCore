@@ -4,6 +4,33 @@
 #include <MeshFEMCore/Types.hh>
 #include <unsupported/Eigen/AutoDiff>
 
+// Eigen 5 removed Eigen::internal::make_coherent from AutoDiffScalar.h;
+// reimplement it with the Eigen 3.4 semantics: if exactly one of the two
+// derivative vectors is empty, resize it to match the other and zero it.
+// (Note: Eigen 5 moved to semantic versioning — EIGEN_WORLD_VERSION remains 3
+// forever and the major version lives in EIGEN_MAJOR_VERSION.)
+#if EIGEN_MAJOR_VERSION >= 5
+namespace Eigen {
+namespace internal {
+    template<typename DerTypeA, typename DerTypeB>
+    inline void make_coherent(const DerTypeA &a, const DerTypeB &b) {
+        // Eigen 3.4's implementation const-casts too (the derivatives are
+        // semantically mutable scratch space of the AutoDiffScalar pair).
+        DerTypeA &a_ref = const_cast<DerTypeA &>(a);
+        DerTypeB &b_ref = const_cast<DerTypeB &>(b);
+        if (a_ref.size() == 0 && b_ref.size() != 0) {
+            a_ref.resize(b_ref.size());
+            a_ref.setZero();
+        }
+        else if (b_ref.size() == 0 && a_ref.size() != 0) {
+            b_ref.resize(a_ref.size());
+            b_ref.setZero();
+        }
+    }
+} // namespace internal
+} // namespace Eigen
+#endif
+
 namespace MeshFEM {
 
 using ADReal = Eigen::AutoDiffScalar<Eigen::Matrix<Real, 1, 1>>;
