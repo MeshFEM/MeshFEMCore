@@ -25,7 +25,11 @@ typedef VectorND<3> Vector3D;
 typedef  PointND<2>  Point2D;
 typedef VectorND<2> Vector2D;
 
-MESHFEM_EXPORT extern Eigen::IOFormat pointFormatter;
+// Print points as [x, y, z]
+inline Eigen::IOFormat pointFormatter(Eigen::FullPrecision, Eigen::DontAlignCols,
+        /* coeff separator */ "", /* row separator */ ", ",
+        /* row prefix */ "", /* row suffix */ "", /* mat prefix */ "[",
+        /* mat suffix */ "]");
 
 // Types templated on floating point representation.
 template<typename Real_> using  Vec3_T = Eigen::Matrix<Real_, 3, 1>;
