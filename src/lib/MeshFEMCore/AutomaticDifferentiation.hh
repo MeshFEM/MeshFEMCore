@@ -210,6 +210,15 @@ namespace Eigen {
                          MeshFEM::safe_numeric_limits<Scalar>::min() // minimum positive normalized value
         ));
 
+#if EIGEN_MAJOR_VERSION >= 5
+        const Scalar val = std::pow(x.value(), p.value());
+        const auto x_derivatives = x.derivatives() * p.value();
+        const auto p_derivatives = p.derivatives() * x.value() * safe_logx;
+
+        return MakeAutoDiffScalar(val,
+                std::pow(x.value(), p.value() - 1.0) *
+                internal::MakeCoherentCwiseBinaryOp<internal::scalar_sum_op<Scalar>>(x_derivatives, p_derivatives));
+#else
         // Note: make_coherent const-casts the derivatives.
         internal::make_coherent(x.derivatives(), p.derivatives());
 
@@ -218,6 +227,7 @@ namespace Eigen {
                     x.derivatives() * p.value() +
                     p.derivatives() * x.value() * safe_logx
                 ));
+#endif
     }
 }
 
