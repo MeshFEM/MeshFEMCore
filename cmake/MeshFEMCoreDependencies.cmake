@@ -39,16 +39,16 @@ if(NOT TARGET TBB::tbb)
     meshfem_download_tbb()
     add_subdirectory(${MESHFEM_EXTERNAL}/tbb ${CMAKE_BINARY_DIR}/tbb EXCLUDE_FROM_ALL)
 
+    # Modern oneTBB defines TBB::tbb itself; keep this fallback for older
+    # TBB versions that only define the concrete tbb/tbbmalloc targets.
     if(NOT TARGET TBB::tbb)
         add_library(tbb_tbb INTERFACE)
-        # Note: declaring TBB as a system header results in the local `tbb`
-        # include directory being listed after other system include paths,
-        # potentially causing an incompatible system-wide version of the headers
-        # to leak in. Instead, we suppress warnings from the TBB headers using
-        # #pragmas in `Parallelism.hh`.
         target_link_libraries(tbb_tbb INTERFACE tbbmalloc tbb)
         add_library(TBB::tbb ALIAS tbb_tbb)
-
-        meshfem_target_hide_warnings(tbb_tbb)
     endif()
+
+    # oneTBB headers can trigger a large volume of warnings, some of which
+    # can be treated as errors by other libraries. We suppress those warnings
+    # by patching the relevant library targets to mark their headers as SYSTEM.
+    meshfem_target_hide_warnings(tbb tbbmalloc)
 endif()
