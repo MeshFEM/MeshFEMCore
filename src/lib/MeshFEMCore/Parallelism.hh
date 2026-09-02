@@ -28,6 +28,10 @@
 #include <iostream>
 #endif
 
+#ifdef interface
+#undef interface
+#endif
+
 namespace MeshFEM {
 
 MESHFEM_EXPORT void   set_max_num_tbb_threads(int num_threads);

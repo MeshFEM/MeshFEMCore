@@ -21,15 +21,13 @@ option(MESHFEM_DISABLE_CXX11_ABI_GCC "Don't use GCC's new C++11 ABI; needed to p
 include(MeshFEMCoreDependencies)
 
 add_library(MeshFEMCore STATIC
-    src/lib/MeshFEMCore/Types.cc
     src/lib/MeshFEMCore/Parallelism.cc
     src/lib/MeshFEMCore/GlobalBenchmark.cc
 )
 
 # Keep the existing export macro available when MeshFEMCore is built without
 # the outer MeshFEM shared library.
-include(GenerateExportHeader)
-generate_export_header(MeshFEMCore
+meshfem_generate_export_header(MeshFEMCore
     BASE_NAME MeshFEM
     EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/exports/MeshFEM_export.h
 )
@@ -50,7 +48,7 @@ target_link_libraries(MeshFEMCore
 )
 
 target_compile_definitions(MeshFEMCore PUBLIC -DMESHFEM_WITH_TBB -DNOMINMAX -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_USE_MATH_DEFINES)
-target_compile_options(MeshFEMCore PUBLIC -fvisibility=hidden)
+meshfem_apply_abi_flags(MeshFEMCore)
 
 if(MESHFEM_NATIVE)
     CHECK_CXX_COMPILER_FLAG(-march=native COMPILER_SUPPORTS_MARCH_NATIVE)

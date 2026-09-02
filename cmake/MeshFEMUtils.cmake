@@ -1,3 +1,32 @@
+function(meshfem_apply_abi_flags target)
+    target_compile_options(${target} PUBLIC
+        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-fvisibility=hidden>
+        $<$<CXX_COMPILER_ID:MSVC>:/bigobj>)
+endfunction()
+
+function(meshfem_generate_export_header target)
+    include(GenerateExportHeader)
+    # generate_export_header emits the dllexport/dllimport pair as MESHFEM_EXPORT_DATA;
+    # MESHFEM_EXPORT is defined here and never becomes dllimport, so consumers instantiate
+    # templates themselves. Identical on ELF. See docs/WINDOWS-BUILD.md.
+    set(MESHFEM_EXPORT_CONTENT "
+// Use MESHFEM_EXPORT_DATA only for variables whose instance must be shared between
+// modules; MESHFEM_EXPORT for everything else.
+#ifndef MESHFEM_EXPORT
+#  if defined(MESHFEM_STATIC_DEFINE) || !defined(_MSC_VER)
+#    define MESHFEM_EXPORT MESHFEM_EXPORT_DATA
+#  elif defined(${target}_EXPORTS)
+#    define MESHFEM_EXPORT __declspec(dllexport)
+#  else
+#    define MESHFEM_EXPORT
+#  endif
+#endif
+")
+    generate_export_header(${target} ${ARGN}
+        EXPORT_MACRO_NAME MESHFEM_EXPORT_DATA
+        CUSTOM_CONTENT_FROM_VARIABLE MESHFEM_EXPORT_CONTENT)
+endfunction()
+
 function(meshfem_single_app name)
     add_executable(${name} ${name}.cc)
     target_link_libraries(${name} ${ARGN})

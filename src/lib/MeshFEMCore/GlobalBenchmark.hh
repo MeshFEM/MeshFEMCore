@@ -15,8 +15,8 @@ namespace MeshFEM {
 
 #ifdef BENCHMARK
 
-MESHFEM_EXPORT extern Timer g_timer;
-MESHFEM_EXPORT extern std::vector<std::string> g_benchmarkMessages;
+MESHFEM_EXPORT_DATA extern Timer g_timer;
+MESHFEM_EXPORT_DATA extern std::vector<std::string> g_benchmarkMessages;
 
 inline void BENCHMARK_START_TIMER_SECTION(const std::string &name) { g_timer.startSection(name); }
 inline void  BENCHMARK_STOP_TIMER_SECTION(const std::string &name) { g_timer.stopSection(name); }
